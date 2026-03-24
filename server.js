@@ -11,36 +11,34 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: path.join(__dirname, 'backend', '.env') });
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// API Routes (from backend)
-const promptRoutes = (await import('./backend/routes/promptRoutes.js')).default;
-const templateRoutes = (await import('./backend/routes/templateRoutes.js')).default;
-const historyRoutes = (await import('./backend/routes/historyRoutes.js')).default;
-const suggestionRoutes = (await import('./backend/routes/suggestionRoutes.js')).default;
-const embeddingRoutes = (await import('./backend/routes/embeddingRoutes.js')).default;
+// Load routes
+const promptRoutes = await import('./backend/routes/promptRoutes.js');
+const templateRoutes = await import('./backend/routes/templateRoutes.js');
+const historyRoutes = await import('./backend/routes/historyRoutes.js');
+const suggestionRoutes = await import('./backend/routes/suggestionRoutes.js');
+const embeddingRoutes = await import('./backend/routes/embeddingRoutes.js');
 
-app.use('/api/prompt', promptRoutes);
-app.use('/api/templates', templateRoutes);
-app.use('/api/history', historyRoutes);
-app.use('/api/suggestions', suggestionRoutes);
-app.use('/api/embeddings', embeddingRoutes);
+app.use('/api/prompt', promptRoutes.default);
+app.use('/api/templates', templateRoutes.default);
+app.use('/api/history', historyRoutes.default);
+app.use('/api/suggestions', suggestionRoutes.default);
+app.use('/api/embeddings', embeddingRoutes.default);
 
-// Serve static frontend files from Vite build
-app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+// Serve static frontend
+const distPath = path.join(__dirname, 'dist');
+app.use(express.static(distPath));
 
-// SPA fallback - serve index.html for unknown routes
+// SPA fallback
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ status: 'OK' });
 });
 
-app.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export default app;
