@@ -1,10 +1,6 @@
 {
   "builds": [
     {
-      "src": "dist/**",
-      "use": "@vercel/static"
-    },
-    {
       "src": "server.js",
       "use": "@vercel/node"
     }
@@ -15,8 +11,12 @@
       "dest": "server.js"
     },
     {
+      "src": "/assets/(.*)",
+      "dest": "server.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "dist/index.html"
+      "dest": "server.js"
     }
   ]
 }
